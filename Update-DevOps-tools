@@ -1,0 +1,136 @@
+#!/usr/bin/env bash
+
+if [[ $EUID -ne 0 ]]; then
+  DEST="${HOME}/bin"
+  BASHCOMP="${HOME}/.bash_completion"
+  mkdir -p ${DEST} 
+  mkdir -p ${BASHCOMP} 
+else
+  DEST="/usr/local/bin"
+  BASHCOMP="/etc/bash_completion.d"
+fi
+echo "Download DevOps tools in ${DEST} directory:"
+
+function Vault {
+  VAULT_VERSION=`curl -s https://www.vaultproject.io/downloads | sed 's/<span/\n/g' | grep 'Current Version:' |sed 's/^.*>\([0-9.]*\)<.*$/\1/' | head -n 1`
+  VAULT_VERSION_INSTALLED=`${DEST}/vault version | grep "^Vault" | cut -d'v' -f2`
+  if [ "${VAULT_VERSION}" != "${VAULT_VERSION_INSTALLED}" ]; then
+    echo "Update VAULT in version ${VAULT_VERSION} > ${VAULT_VERSION_INSTALLED}"
+    curl -s -L -o /tmp/vault.zip https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip  && unzip -o /tmp/vault.zip -d ${DEST}
+  else
+    echo "VAULT already updated in version ${VAULT_VERSION}"
+  fi
+}
+
+function Consul {
+  CONSUL_VERSION=`curl -s https://www.consul.io/downloads | sed 's/<span/\n/g' | grep 'Current Version:' |sed 's/^.*>\([0-9.]*\)<.*$/\1/' | head -n 1`
+  CONSUL_VERSION_INSTALLED=`${DEST}/consul version | grep "^Consul" | cut -d'v' -f2`
+  if [ "${CONSUL_VERSION}" != "${CONSUL_VERSION_INSTALLED}" ]; then
+    echo "Update CONSUL in version ${CONSUL_VERSION} > ${CONSUL_VERSION_INSTALLED}"
+    curl -s -L -o /tmp/consul.zip https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip  && unzip -o /tmp/consul.zip -d ${DEST}
+  else
+    echo "CONSUL already updated in version ${CONSUL_VERSION}"
+  fi
+}
+
+function Stern {
+  STERN_VERSION=`curl -s https://api.github.com/repos/wercker/stern/releases/latest  | grep '"tag_name":' | cut -d\" -f4`
+  STERN_VERSION_INSTALLED=`${DEST}/stern --version | cut -d' ' -f3`
+  if [ "${STERN_VERSION}" != "${STERN_VERSION_INSTALLED}" ]; then
+    echo "Update STERN in version ${STERN_VERSION} > ${STERN_VERSION_INSTALLED}"
+    curl -s -L -o ${DEST}/stern https://github.com/wercker/stern/releases/download/${STERN_VERSION}/stern_linux_amd64  && chmod +x ${DEST}/stern
+    stern --completion bash > ${BASHCOMP}/stern.bash
+  else
+    echo "STERN already updated in version ${STERN_VERSION}"
+  fi
+}
+
+function Helm {
+  HELM_VERSION=`curl -s https://api.github.com/repos/helm/helm/releases/latest  | grep '"tag_name":' | cut -d\" -f4`
+  HELM_VERSION_INSTALLED=`${DEST}/helm version | cut -d\" -f2`
+  if [ "${HELM_VERSION}" != "${HELM_VERSION_INSTALLED}" ]; then
+    echo "Update HELM in version ${HELM_VERSION} > ${$HELM_VERSION_INSTALLED}"
+    curl -s -L https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz  | tar zx -C ${DEST} --strip-components=1 linux-amd64/helm
+    chmod +x ${DEST}/helm
+    helm completion bash > ${BASHCOMP}/helm.bash
+  else
+    echo "HELM already updated in version ${HELM_VERSION}"
+  fi
+}
+  
+function K9s {
+  K9S_VERSION=`curl -s https://api.github.com/repos/derailed/k9s/releases/latest  | grep '"tag_name":' | awk -F '"' '{printf("%s",$4)}'`
+  K9S_VERSION_INSTALLED=`${DEST}/k9s version -s | grep "Version" | awk '{printf("v%s",$2)}'`
+  if [ "${K9S_VERSION}" != "${K9S_VERSION_INSTALLED}" ]; then
+    echo "Update K9S in version ${K9S_VERSION} > ${K9S_VERSION_INSTALLED}"
+    curl -s -L https://github.com/derailed/k9s/releases/download/${K9S_VERSION}/k9s_Linux_x86_64.tar.gz  | tar zx -C ${DEST} k9s
+  else
+    echo "K9S already updated in version ${K9S_VERSION}"
+  fi
+}
+  
+function Kubectl {
+  KUBECTL_VERSION=`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`
+  KUBECTL_VERSION_INSTALLED=`${DEST}/kubectl version 2>/dev/null | grep "^Client" | cut -d\" -f6`
+  if [ "${KUBECTL_VERSION}" != "${KUBECTL_VERSION_INSTALLED}" ]; then
+    echo "Update KUBECTL in version ${KUBECTL_VERSION}"
+    curl -s -L -o ${DEST}/kubectl https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl  && chmod +x ${DEST}/kubectl
+    kubectl completion bash > ${BASHCOMP}/kubectl.bash
+  else
+    echo "KUBECTL already updated in version ${KUBECTL_VERSION}"
+  fi
+}
+
+function Kubectx {
+  KUBECTX_VERSION=`curl -s https://api.github.com/repos/ahmetb/kubectx/releases/latest  | grep '"tag_name":' | cut -d\" -f4`
+  echo "Update KUBECTX in version ${KUBECTX_VERSION}"
+  curl -s -L https://github.com/ahmetb/kubectx/releases/download/${KUBECTX_VERSION}/kubectx_${KUBECTX_VERSION}_linux_x86_64.tar.gz  | tar zx -C ${DEST} kubectx 
+  curl -s -L https://github.com/ahmetb/kubectx/releases/download/${KUBECTX_VERSION}/kubens_${KUBECTX_VERSION}_linux_x86_64.tar.gz  | tar zx -C ${DEST} kubens
+}
+
+if [ $# -ne 0 ]; then
+  for app in $*
+  do  
+    case "${app}" in
+      "vault")
+        Vault 
+        ;;
+  
+      "consul")
+        Consul 
+        ;;
+  
+      "kubectl")
+        Kubectl
+        ;;
+  
+      "kubectx")
+        Kubectx
+        ;;
+  
+      "helm")
+        Helm
+        ;;
+  
+      "stern")
+        Stern
+        ;;
+  
+      "k9s")
+        K9s
+        ;;
+  
+      *)
+        echo "Unknown program!"
+    esac
+  done
+else
+      Kubectl
+      Kubectx
+      Helm
+      Stern
+      K9s
+      Vault
+      Consul
+fi
+
