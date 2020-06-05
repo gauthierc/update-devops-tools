@@ -8,6 +8,7 @@ Automatically downloads and updates my favorite tools.
 - [x] K9s https://k9scli.io
 - [x] Vault https://www.vaultproject.io/
 - [x] Consul https://www.consul.io/
+- [x] RKE https://rancher.com/
 - [ ] Rancher-cli https://rancher.com/
 
 ## Usage
