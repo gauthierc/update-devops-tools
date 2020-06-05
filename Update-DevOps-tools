@@ -71,7 +71,7 @@ function K9s {
   
 function Kubectl {
   KUBECTL_VERSION=`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`
-  KUBECTL_VERSION_INSTALLED=`${DEST}/kubectl version 2>/dev/null | grep "^Client" | cut -d\" -f6`
+  KUBECTL_VERSION_INSTALLED=`${DEST}/kubectl version --client=true 2>/dev/null | cut -d\" -f6`
   if [ "${KUBECTL_VERSION}" != "${KUBECTL_VERSION_INSTALLED}" ]; then
     echo "Update KUBECTL in version ${KUBECTL_VERSION}"
     curl -s -L -o ${DEST}/kubectl https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl  && chmod +x ${DEST}/kubectl
