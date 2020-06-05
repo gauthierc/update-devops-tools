@@ -2,7 +2,7 @@
 
 if [[ $EUID -ne 0 ]]; then
   DEST="${HOME}/bin"
-  BASHCOMP="${HOME}/.bash_completion"
+  BASHCOMP="${HOME}/.local/share/bash-completion"
   mkdir -p ${DEST} 
   mkdir -p ${BASHCOMP} 
 else
