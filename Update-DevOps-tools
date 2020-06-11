@@ -119,6 +119,20 @@ function Rke {
   fi
 }
 
+function RancherCLI {
+  RANCHERCLI_VERSION=`curl -s https://api.github.com/repos/rancher/cli/releases/latest  | grep '"tag_name":' | cut -d\" -f4`
+  if [ -f "${DEST}/rancher" ]; then
+    RANCHERCLI_VERSION_INSTALLED=`${DEST}/rancher --version | cut -d' ' -f3`
+  fi
+  if [ "${RANCHERCLI_VERSION}" != "${RANCHERCLI_VERSION_INSTALLED}" ]; then
+    echo "Update RANCHERCLI in version ${RANCHERCLI_VERSION} > ${RANCHERCLI_VERSION_INSTALLED}"
+    curl -s -L https://github.com/rancher/cli/releases/download/${RANCHERCLI_VERSION}/rancher-linux-amd64-${RANCHERCLI_VERSION}.tar.gz  | tar zx ./rancher-${RANCHERCLI_VERSION}/rancher -O > ${DEST}/rancher
+    chmod +x ${DEST}/rancher
+  else
+    echo "RANCHERCLI already updated in version ${RANCHERCLI_VERSION}"
+  fi
+}
+
 if [ $# -ne 0 ]; then
   for app in $*
   do  
@@ -155,6 +169,10 @@ if [ $# -ne 0 ]; then
         Rke
         ;;
   
+      "rancher")
+        RancherCLI
+        ;;
+  
       *)
         echo "Unknown program!"
     esac
@@ -168,5 +186,6 @@ else
       Vault
       Consul
       Rke
+      RancherCLI
 fi
 

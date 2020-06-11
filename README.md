@@ -9,7 +9,7 @@ Automatically downloads and updates my favorite tools.
 - [x] Vault https://www.vaultproject.io/
 - [x] Consul https://www.consul.io/
 - [x] RKE https://rancher.com/
-- [ ] Rancher-cli https://rancher.com/
+- [x] Rancher-cli https://rancher.com/
 - [ ] kube-capacity https://github.com/robscott/kube-capacity 
 - [ ] rbac-lookup https://github.com/FairwindsOps/rbac-lookup
 - [ ] krew https://github.com/kubernetes-sigs/krew
