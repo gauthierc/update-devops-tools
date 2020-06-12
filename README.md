@@ -10,9 +10,9 @@ Automatically downloads and updates my favorite tools.
 - [x] Consul https://www.consul.io/
 - [x] RKE https://rancher.com/
 - [x] Rancher-cli https://rancher.com/
+- [ ] krew https://github.com/kubernetes-sigs/krew
 - [ ] kube-capacity https://github.com/robscott/kube-capacity 
 - [ ] rbac-lookup https://github.com/FairwindsOps/rbac-lookup
-- [ ] krew https://github.com/kubernetes-sigs/krew
 - [ ] ketall https://github.com/corneliusweig/ketall
 - [ ] kube-score https://github.com/zegl/kube-score
 - [ ] ...

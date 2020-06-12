@@ -179,7 +179,6 @@ if [ $# -ne 0 ]; then
   done
 else
       Kubectl
-      Kubectx
       Helm
       Stern
       K9s
